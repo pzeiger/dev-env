@@ -1,0 +1,11 @@
+{
+  "folders": [
+    { "path": "../abTEM", "name": "abTEM" },
+    { "path": "../gpaw", "name": "gpaw" },
+    { "path": "../gpaw-weaver", "name": "gpaw-weaver" }
+    { "path": "../openEELS", "name": "openEELS" },
+  ],
+//  "settings": {
+//    "python.defaultInterpreterPath": "/home/ubuntu/venv/bin/python"
+//  }
+}
