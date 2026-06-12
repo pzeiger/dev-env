@@ -1,5 +1,5 @@
-pip install -e /workspaces/abTEM
-pip install -e /workspaces/gpaw
-pip install -e /workspaces/gpaw-weaver
-pip install -e /workspaces/openEELS
+pip install --no-cache-dir -e /workspaces/abTEM
+pip install --no-cache-dir -e /workspaces/gpaw
+pip install --no-cache-dir -e /workspaces/gpaw-weaver
+pip install --no-cache-dir -e /workspaces/Yoshiax
 

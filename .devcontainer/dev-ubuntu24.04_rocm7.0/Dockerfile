@@ -1,9 +1,11 @@
 # Use ROCm build container on Ubuntu 24.04 as base
 ARG ROCM_VERSION="7.2"
 FROM rocm/dev-ubuntu-24.04:${ROCM_VERSION}-complete 
+ARG ROCM_VERSION
 ENV ROCM_VERSION="${ROCM_VERSION}"
 ENV INSTALL_DIR=/opt/software
 ENV BUILD_THREADS=16
+ENV ROCM_HOME="/opt/rocm"
 
 RUN echo "Starting build of dev container with ROCm ${ROCM_VERSION}"
 
@@ -20,6 +22,27 @@ apt-get install -y git \
     libopenmpi-dev \
     libscalapack-openmpi-dev \
     libdw1
+
+# install Claude CLI
+apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get update && apt-get install -y --no-install-recommends nodejs \
+    && npm install -g @anthropic-ai/claude-code \
+    && rm -rf /var/lib/apt/lists/*
+
+# install github CLI
+(type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
+        && sudo mkdir -p -m 755 /etc/apt/keyrings \
+        && out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+        && cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+        && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+        && sudo mkdir -p -m 755 /etc/apt/sources.list.d \
+        && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+        && sudo apt update \
+        && sudo apt install gh -y
 
 EOF
 
@@ -52,33 +75,34 @@ PIP_WRAPPER
 chmod +x ${VIRTUAL_ENV}/bin/pip
 EOF
 
-RUN pip install ase notebook matplotlib fastrlock
-RUN pip install amd-cupy --extra-index-url https://pypi.amd.com/rocm-7.2.0/simple
-ENV ROCM_HOME="/opt/rocm"
+RUN ls -ahl "${VIRTUAL_ENV}/bin"
+
+COPY --chown=ubuntu:ubuntu install-cupy.sh /tmp/
+RUN chmod +x /tmp/install-cupy.sh && /tmp/install-cupy.sh
 
 USER root
 
 # Get Libxc installed
-#ENV LIBXC_VERSION=7.0.0
-#COPY install-libxc-ubuntu.sh /tmp/
+ENV LIBXC_VERSION=7.0.0
+COPY install-libxc-ubuntu.sh /tmp/
 #RUN ls -la /tmp/install-libxc* && file /tmp/install-libxc-ubuntu.sh && head -5 /tmp/install-libxc-ubuntu.sh && bash -n /tmp/install-libxc-ubuntu.sh
 #RUN set -x && /tmp/install-libxc-ubuntu.sh || { echo "Failed with exit $$?"; exit 1; }
-#RUN chmod +x /tmp/install-libxc-ubuntu.sh && /tmp/install-libxc-ubuntu.sh
+RUN chmod +x /tmp/install-libxc-ubuntu.sh && /tmp/install-libxc-ubuntu.sh
 
-#ENV LIBXC_HOME=${INSTALL_DIR}/libxc
-#ENV LIBXC_INCLUDE=${INSTALL_DIR}/libxc/include
-#ENV LIBXC_LIBS=${INSTALL_DIR}/libxc/lib
-#ENV LD_LIBRARY_PATH=${LIBXC_LIBS}:${LD_LIBRARY_PATH:-}
+ENV LIBXC_HOME=${INSTALL_DIR}/libxc
+ENV LIBXC_INCLUDE=${INSTALL_DIR}/libxc/include
+ENV LIBXC_LIBS=${INSTALL_DIR}/libxc/lib
+ENV LD_LIBRARY_PATH=${LIBXC_LIBS}:${LD_LIBRARY_PATH:-}
 
 # Install Libvdwxc
-#ENV LIBVDWXC_VERSION=0.5.0
-#COPY install-libvdwxc-ubuntu.sh /tmp/
-#RUN chmod +x /tmp/install-libvdwxc-ubuntu.sh && /tmp/install-libvdwxc-ubuntu.sh
+ENV LIBVDWXC_VERSION=0.5.0
+COPY install-libvdwxc-ubuntu.sh /tmp/
+RUN chmod +x /tmp/install-libvdwxc-ubuntu.sh && /tmp/install-libvdwxc-ubuntu.sh
 
-#ENV LIBVDWXC_HOME=${INSTALL_DIR}/libvdwxc
-#ENV LIBVDWXC_INCLUDE=${LIBVDWXC_HOME}/include
-#ENV LIBVDWXC_LIBS=${LIBVDWXC_HOME}/lib
-#ENV LD_LIBRARY_PATH=${LIBVDWXC_LIBS}:${LD_LIBRARY_PATH:-}
+ENV LIBVDWXC_HOME=${INSTALL_DIR}/libvdwxc
+ENV LIBVDWXC_INCLUDE=${LIBVDWXC_HOME}/include
+ENV LIBVDWXC_LIBS=${LIBVDWXC_HOME}/lib
+ENV LD_LIBRARY_PATH=${LIBVDWXC_LIBS}:${LD_LIBRARY_PATH:-}
 
 
 # Clean APT cache
@@ -87,7 +111,8 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN echo 'ubuntu:ubuntu' | chpasswd
 USER ubuntu
 
-RUN echo "$(ls -ahl /tmp)" && echo "Current user: $(whoami)" && echo "Home directory contents: $(ls -ahl ~)"
+# Install python packages
+RUN pip install --no-cache-dir ase h5py jupyterlab matplotlib notebook pypdf xarray
 
 # Install JAX with ROCm support
 ENV JAX_VERSION=0.10.0
@@ -95,11 +120,8 @@ COPY --chown=ubuntu:ubuntu install-jax.sh /tmp/
 RUN chmod +x /tmp/install-jax.sh && /tmp/install-jax.sh
 ENV LLVM_PATH="/opt/rocm/llvm"
 
-#COPY siteconfig.py /home/ubuntu/
-#RUN ls -ahl ./* && GPAW_BUILD_GPU=0 GPAW_CONFIG='/home/ubuntu/siteconfig.py' uv pip install --no-cache-dir gpaw && rm siteconfig.py
-
-# Install Claude AI tool
-RUN curl -fsSL https://claude.ai/install.sh | bash
+COPY --chown=ubuntu:ubuntu siteconfig.py /home/ubuntu/
+RUN ls -ahl ./* && GPAW_BUILD_GPU=0 GPAW_CONFIG='/home/ubuntu/siteconfig.py' pip install --no-cache-dir gpaw && rm siteconfig.py
 
 # This is a supposed fix to help with gfx1151
 # See: https://github.com/pytorch/pytorch/issues/164346

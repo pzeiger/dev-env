@@ -16,9 +16,10 @@
       "source=${localWorkspaceFolder}/../abTEM,target=/workspaces/abTEM,type=bind",
       "source=${localWorkspaceFolder}/../gpaw,target=/workspaces/gpaw,type=bind",
       "source=${localWorkspaceFolder}/../gpaw-weaver,target=/workspaces/gpaw-weaver,type=bind",
-      "source=${localWorkspaceFolder}/../openEELS,target=/workspaces/openEELS,type=bind"
+      "source=${localWorkspaceFolder}/../Yoshiax,target=/workspaces/Yoshiax,type=bind",
+      "source=${localWorkspaceFolder}/../projects,target=/workspaces/projects,type=bind"
     ],
-//    "postCreateCommand": "bash /workspaces/dev-env/setup.sh",
+    "postCreateCommand": "bash /workspaces/dev-env/setup.sh && pip install --no-cache-dir pypdf",
 //    "postCreateCommand": "uv pip install --no-cache-dir -e . && uv pip install --no-cache-dir xarray jupyterlab",
 //    "postStartCommand": "nohup bash -c 'jupyter notebook --ip=0.0.0.0 --port=8888 --allow-root --NotebookApp.token='' --no-browser > nohup.out &'",
 
@@ -62,11 +63,12 @@
         "CLAUDE_CODE_OAUTH_TOKEN": "${localEnv:CLAUDE_CODE_OAUTH_TOKEN}",
         "ANTHROPIC_OAUTH_TOKEN": "${localEnv:CLAUDE_CODE_OAUTH_TOKEN}",
         "ANTHROPIC_API_KEY": "${localEnv:ANTHROPIC_API_KEY}",
-        "CLAUDE_CONFIG_DIR": "/workspaces/dev-env/.claude"
+        "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
+        "CLAUDE_CONFIG_DIR": "/workspaces/dev-env/.claude",
         "GPAW_NEW": "0",
         "GPAW_USE_GPUS": "0",
         "CLAUDE_CODE_OAUTH_TOKEN": "${localEnv:CLAUDE_CODE_OAUTH_TOKEN}",
-        "ANTHROPIC_OAUTH_TOKEN": "${localEnv:ANTHROPIC_OAUTH_TOKEN}",
+        "ANTHROPIC_OAUTH_TOKEN": "${localEnv:ANTHROPIC_OAUTH_TOKEN}"
     }
 
 }
