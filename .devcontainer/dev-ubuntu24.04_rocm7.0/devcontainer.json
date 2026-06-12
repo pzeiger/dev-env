@@ -8,24 +8,17 @@
     },
 
     "workspaceFolder": "/workspaces/dev-env",
-//    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
     "remoteUser": "ubuntu",
     "updateRemoteUserUID": true,
 
     "mounts": [
-      "source=${localWorkspaceFolder}/../abTEM,target=/workspaces/abTEM,type=bind",
-      "source=${localWorkspaceFolder}/../gpaw,target=/workspaces/gpaw,type=bind",
-      "source=${localWorkspaceFolder}/../gpaw-weaver,target=/workspaces/gpaw-weaver,type=bind",
-      "source=${localWorkspaceFolder}/../Yoshiax,target=/workspaces/Yoshiax,type=bind",
+      "source=${localWorkspaceFolder}/../code/abTEM,target=/workspaces/code/abTEM,type=bind",
+      "source=${localWorkspaceFolder}/../code/gpaw,target=/workspaces/code/gpaw,type=bind",
+      "source=${localWorkspaceFolder}/../code/gpaw-weaver,target=/workspaces/code/gpaw-weaver,type=bind",
+      "source=${localWorkspaceFolder}/../code/ouijax,target=/workspaces/code/ouijax,type=bind",
       "source=${localWorkspaceFolder}/../projects,target=/workspaces/projects,type=bind"
     ],
     "postCreateCommand": "bash /workspaces/dev-env/setup.sh && pip install --no-cache-dir pypdf",
-//    "postCreateCommand": "uv pip install --no-cache-dir -e . && uv pip install --no-cache-dir xarray jupyterlab",
-//    "postStartCommand": "nohup bash -c 'jupyter notebook --ip=0.0.0.0 --port=8888 --allow-root --NotebookApp.token='' --no-browser > nohup.out &'",
-
-//    "forwardPorts": [
-//        8888
-//    ],
 
     // Configure tool-specific properties.
     "customizations": {

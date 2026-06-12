@@ -1,12 +1,5 @@
 {
   "folders": [
-    { "path": "../abTEM", "name": "abTEM" },
-    { "path": "../dev-env", "name": "dev-env" },
-    { "path": "../gpaw", "name": "gpaw" },
-    { "path": "../gpaw-weaver", "name": "gpaw-weaver" }
-    { "path": "../Yoshiax", "name": "Yoshiax" },
+    { "path": "/workspaces", "name": "Root" },
   ],
-//  "settings": {
-//    "python.defaultInterpreterPath": "/home/ubuntu/venv/bin/python"
-//  }
 }
