@@ -15,7 +15,7 @@
       "source=${localWorkspaceFolder}/../code/abTEM,target=/workspaces/code/abTEM,type=bind",
       "source=${localWorkspaceFolder}/../code/gpaw,target=/workspaces/code/gpaw,type=bind",
       "source=${localWorkspaceFolder}/../code/gpaw-weaver,target=/workspaces/code/gpaw-weaver,type=bind",
-      "source=${localWorkspaceFolder}/../code/ouijax,target=/workspaces/code/ouijax,type=bind",
+      "source=${localWorkspaceFolder}/../code/EELSfornax,target=/workspaces/code/EELSfornax,type=bind",
       "source=${localWorkspaceFolder}/../projects,target=/workspaces/projects,type=bind"
     ],
     "postCreateCommand": "bash /workspaces/dev-env/setup.sh && pip install --no-cache-dir pypdf",
