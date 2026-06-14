@@ -7,7 +7,7 @@
         "dockerfile": "Dockerfile"
     },
 
-    "workspaceFolder": "/workspaces/dev-env",
+    "workspaceFolder": "/workspaces",
     "remoteUser": "ubuntu",
     "updateRemoteUserUID": true,
 
@@ -16,10 +16,11 @@
       "source=${localWorkspaceFolder}/../code/gpaw,target=/workspaces/code/gpaw,type=bind",
       "source=${localWorkspaceFolder}/../code/gpaw-weaver,target=/workspaces/code/gpaw-weaver,type=bind",
       "source=${localWorkspaceFolder}/../code/EELSfornax,target=/workspaces/code/EELSfornax,type=bind",
-      "source=${localWorkspaceFolder}/../projects,target=/workspaces/projects,type=bind"
+      "source=${localWorkspaceFolder}/../projects,target=/workspaces/projects,type=bind",
+      "source=${localWorkspaceFolder}/../run,target=/workspaces/run,type=bind"
     ],
-    "postCreateCommand": "bash /workspaces/dev-env/setup.sh && pip install --no-cache-dir pypdf",
-    "postStartCommand": "gpaw test && gpaw -P 4 test && nohup bash -c 'jupyter notebook --ip=0.0.0.0 --port=8888 --allow-root --NotebookApp.token='' --no-browser > nohup.out &'",
+    "postCreateCommand": "GPAW_CONFIG='${containerWorkspaceFolder}/dev-env/.devcontainer/dev-ubuntu24.04_rocm7.0/siteconfig.py' bash /workspaces/dev-env/setup.sh && pip install --no-cache-dir pypdf",
+    "postStartCommand": "cd /workspaces/run && gpaw test && gpaw -P 4 test && cd ${containerWorkspaceFolder} && nohup bash -c 'jupyter notebook --ip=0.0.0.0 --port=8888 --allow-root --NotebookApp.token='' --no-browser > /home/ubuntu/nohup.out &'",
 
     "forwardPorts": [
         8888
@@ -64,9 +65,7 @@
         "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
         "CLAUDE_CONFIG_DIR": "/workspaces/dev-env/.claude",
         "GPAW_NEW": "0",
-        "GPAW_USE_GPUS": "0",
-        "CLAUDE_CODE_OAUTH_TOKEN": "${localEnv:CLAUDE_CODE_OAUTH_TOKEN}",
-        "ANTHROPIC_OAUTH_TOKEN": "${localEnv:ANTHROPIC_OAUTH_TOKEN}"
+        "GPAW_USE_GPUS": "0"
     }
 
 }
