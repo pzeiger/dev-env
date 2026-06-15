@@ -65,7 +65,9 @@
         "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
         "CLAUDE_CONFIG_DIR": "/workspaces/dev-env/.claude",
         "GPAW_NEW": "0",
-        "GPAW_USE_GPUS": "0"
+        "GPAW_USE_GPUS": "0",
+        "XLA_PYTHON_CLIENT_PREALLOCATE": "false",
+        "JAX_COMPILATION_CACHE_DIR": "/workspaces/run/.jax_cache"
     }
 
 }
