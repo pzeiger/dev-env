@@ -115,10 +115,10 @@ USER ubuntu
 RUN pip install --no-cache-dir ase h5py jupyterlab matplotlib notebook pypdf xarray
 
 # Install JAX with ROCm support
-ENV JAX_VERSION=0.10.0
-COPY --chown=ubuntu:ubuntu install-jax.sh /tmp/
-RUN chmod +x /tmp/install-jax.sh && /tmp/install-jax.sh
-ENV LLVM_PATH="/opt/rocm/llvm"
+#ENV JAX_VERSION=0.10.0
+#COPY --chown=ubuntu:ubuntu install-jax.sh /tmp/
+#RUN chmod +x /tmp/install-jax.sh && /tmp/install-jax.sh
+#ENV LLVM_PATH="/opt/rocm/llvm"
 
 #COPY --chown=ubuntu:ubuntu siteconfig.py /home/ubuntu/
 #RUN ls -ahl ./* && GPAW_BUILD_GPU=0 GPAW_CONFIG='/home/ubuntu/siteconfig.py' pip install --no-cache-dir gpaw && rm siteconfig.py
