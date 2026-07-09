@@ -50,6 +50,24 @@ apt-get update && apt-get install -y --no-install-recommends \
 apt-get autoremove -y
 EOF
 
+# Install Apptainer from the official PPA (non-setuid installation), so
+# container images (e.g. for NCSA Delta) can be built inside this devcontainer.
+# Unprivileged/--fakeroot builds need subuid/subgid mappings for the ubuntu
+# user and user namespaces (the devcontainer already runs with
+# seccomp=unconfined); `apptainer exec` of .sif images additionally needs
+# /dev/fuse (see runArgs in devcontainer.json).
+RUN << 'EOF'
+set -e
+apt-get update
+apt-get install -y software-properties-common
+add-apt-repository -y ppa:apptainer/ppa
+apt-get update
+apt-get install -y apptainer
+grep -q '^ubuntu:' /etc/subuid || echo 'ubuntu:100000:65536' >> /etc/subuid
+grep -q '^ubuntu:' /etc/subgid || echo 'ubuntu:100000:65536' >> /etc/subgid
+rm -rf /var/lib/apt/lists/*
+EOF
+
 # Set up Python virtual environment and upgrade pip and setuptools
 # Copy uv into image
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/

@@ -51,6 +51,7 @@
         "seccomp=unconfined",
         "--device=/dev/kfd",
         "--device=/dev/dri",
+        "--device=/dev/fuse",
         "--group-add=video",
         "--ipc=host",
         "--shm-size",
