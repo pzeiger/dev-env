@@ -6,8 +6,8 @@ set -euxo pipefail
 
 echo "$PATH"
 
-#pip install jax==${JAX_VERSION}
-#pip install jax-rocm7-pjrt==${JAX_VERSION}
-#pip install jax-rocm7-plugin==${JAX_VERSION}
-#pip install https://github.com/ROCm/rocm-jax/releases/download/rocm-jax-v${JAX_VERSION}/jaxlib-${JAX_VERSION}+rocm7-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+#uv pip install jax==${JAX_VERSION}
+#uv pip install jax-rocm7-pjrt==${JAX_VERSION}
+#uv pip install jax-rocm7-plugin==${JAX_VERSION}
+#uv pip install https://github.com/ROCm/rocm-jax/releases/download/rocm-jax-v${JAX_VERSION}/jaxlib-${JAX_VERSION}+rocm7-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
 

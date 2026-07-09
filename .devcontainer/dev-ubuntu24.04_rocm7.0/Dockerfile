@@ -9,6 +9,9 @@ ENV ROCM_HOME="/opt/rocm"
 
 RUN echo "Starting build of dev container with ROCm ${ROCM_VERSION}"
 
+# Set empy password for ubuntu user
+RUN echo 'ubuntu:ubuntu' | chpasswd
+
 # Ensure system packages are up to date and install global dependencies
 RUN << 'EOF'
 apt-get update
@@ -44,8 +47,8 @@ apt-get update && apt-get install -y --no-install-recommends \
         && sudo apt update \
         && sudo apt install gh -y
 
+apt-get autoremove -y
 EOF
-
 
 # Set up Python virtual environment and upgrade pip and setuptools
 # Copy uv into image
@@ -61,19 +64,19 @@ ENV VIRTUAL_ENV="/home/ubuntu/venv"
 RUN uv venv $VIRTUAL_ENV --python 3.12
 ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 
-RUN << 'EOF'
-mv "${VIRTUAL_ENV}/bin/pip" "${VIRTUAL_ENV}/bin/pip-native"
+# RUN << 'EOF'
+# mv "${VIRTUAL_ENV}/bin/pip" "${VIRTUAL_ENV}/bin/pip-native"
 
-cat > ${VIRTUAL_ENV}/bin/pip << 'PIP_WRAPPER'
-#!/usr/bin/env bash
-# Wrapper: redirect pip calls to uv pip for this venv
+# cat > ${VIRTUAL_ENV}/bin/pip << 'PIP_WRAPPER'
+# #!/usr/bin/env bash
+# # Wrapper: redirect pip calls to uv pip for this venv
 
-VENV_DIR="${VIRTUAL_ENV}"
-exec uv pip --no-managed-python --no-cache "$@"
-PIP_WRAPPER
+# VENV_DIR="${VIRTUAL_ENV}"
+# exec uv pip --no-managed-python --no-cache "$@"
+# PIP_WRAPPER
 
-chmod +x ${VIRTUAL_ENV}/bin/pip
-EOF
+# chmod +x ${VIRTUAL_ENV}/bin/pip
+# EOF
 
 RUN ls -ahl "${VIRTUAL_ENV}/bin"
 
@@ -85,9 +88,17 @@ USER root
 # Get Libxc installed
 ENV LIBXC_VERSION=7.0.0
 COPY install-libxc-ubuntu.sh /tmp/
-#RUN ls -la /tmp/install-libxc* && file /tmp/install-libxc-ubuntu.sh && head -5 /tmp/install-libxc-ubuntu.sh && bash -n /tmp/install-libxc-ubuntu.sh
-#RUN set -x && /tmp/install-libxc-ubuntu.sh || { echo "Failed with exit $$?"; exit 1; }
 RUN chmod +x /tmp/install-libxc-ubuntu.sh && /tmp/install-libxc-ubuntu.sh
+RUN chown -R ubuntu:ubuntu /tmp/libxc-${LIBXC_VERSION}
+
+# --- Python bindings: ubuntu, into the venv ---
+USER ubuntu
+RUN uv pip install --no-cache --upgrade setuptools wheel numpy # build dependencies
+RUN uv pip install --no-cache --no-build-isolation /tmp/libxc-${LIBXC_VERSION}
+
+# --- cleanup ---
+USER root
+RUN rm -rf /tmp/libxc-${LIBXC_VERSION}*
 
 ENV LIBXC_HOME=${INSTALL_DIR}/libxc
 ENV LIBXC_INCLUDE=${INSTALL_DIR}/libxc/include
@@ -104,15 +115,13 @@ ENV LIBVDWXC_INCLUDE=${LIBVDWXC_HOME}/include
 ENV LIBVDWXC_LIBS=${LIBVDWXC_HOME}/lib
 ENV LD_LIBRARY_PATH=${LIBVDWXC_LIBS}:${LD_LIBRARY_PATH:-}
 
-
 # Clean APT cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN echo 'ubuntu:ubuntu' | chpasswd
 USER ubuntu
 
 # Install python packages
-RUN pip install --no-cache-dir ase h5py jupyterlab matplotlib notebook pypdf xarray
+RUN uv pip install --no-cache torch torchvision --index-url https://download.pytorch.org/whl/rocm${ROCM_VERSION}
 
 # Install JAX with ROCm support
 #ENV JAX_VERSION=0.10.0
@@ -121,7 +130,7 @@ RUN pip install --no-cache-dir ase h5py jupyterlab matplotlib notebook pypdf xar
 #ENV LLVM_PATH="/opt/rocm/llvm"
 
 #COPY --chown=ubuntu:ubuntu siteconfig.py /home/ubuntu/
-#RUN ls -ahl ./* && GPAW_BUILD_GPU=0 GPAW_CONFIG='/home/ubuntu/siteconfig.py' pip install --no-cache-dir gpaw && rm siteconfig.py
+#RUN ls -ahl ./* && GPAW_BUILD_GPU=0 GPAW_CONFIG='/home/ubuntu/siteconfig.py' uv pip install --no-cache gpaw && rm siteconfig.py
 
 # This is a supposed fix to help with gfx1151
 # See: https://github.com/pytorch/pytorch/issues/164346

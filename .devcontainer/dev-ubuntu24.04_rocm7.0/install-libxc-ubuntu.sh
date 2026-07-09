@@ -2,10 +2,6 @@
 
 set -euxo pipefail
 
-echo $PATH
-which python
-which pip
-
 # libxc {version} module - DFT exchange-correlation functionals library
 
 # Install build dependencies
@@ -13,11 +9,9 @@ which pip
 # autoconf automake libtool         provides full Autotools toolchain
 apt-get install -y -q \
     wget \
-    autoconf automake libtool \
     build-essential gfortran \
     cmake
-
-pip install setuptools pytest
+    #    autoconf automake libtool \ 
 
 # Set installation prefix
 LIBXC_PREFIX=${INSTALL_DIR}/libxc-${LIBXC_VERSION}
@@ -28,30 +22,36 @@ wget https://gitlab.com/libxc/libxc/-/archive/${LIBXC_VERSION}/libxc-${LIBXC_VER
 tar xf libxc-${LIBXC_VERSION}.tar.gz
 cd libxc-${LIBXC_VERSION}
 
-#export CFLAGS="{build_flags_c}"
-#export FFLAGS="{build_flags_f}"
+
+cmake -S . -B build \
+  -DCMAKE_INSTALL_PREFIX="${LIBXC_PREFIX}" \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DBUILD_SHARED_LIBS=ON \
+  -DENABLE_FORTRAN=ON \
+  -DENABLE_PYTHON=ON
+cmake --build build -j "${BUILD_THREADS}"
+ctest --parallel "${BUILD_THREADS}" --test-dir build     # replaces 'make check'; drop if too slow
+cmake --install build                                    # root: writes to /opt
+
 
 # Configure with optimizations
-autoreconf -i
-./configure --prefix=${LIBXC_PREFIX} \
-    --enable-shared \
-    --disable-static \
-    --enable-fortran
+# autoreconf -i
+# ./configure --prefix=${LIBXC_PREFIX} \
+#     --enable-shared \
+#     --disable-static \
+#     --enable-fortran
 
-# Build and install
-make -j ${BUILD_THREADS}
-make check
-make install
-
-# install python bindings
-python setup.py install
+# # Build and install
+# make -j ${BUILD_THREADS}
+# make check
+# make install
 
 # Create symlink for easy reference
-ln -sf ${LIBXC_PREFIX} ${INSTALL_DIR}/libxc
+ln -sfn "${LIBXC_PREFIX}" "${INSTALL_DIR}/libxc"
 
 # Cleanup
-cd /tmp
-rm -rf libxc-${LIBXC_VERSION}*
+#cd /tmp
+#rm -rf libxc-${LIBXC_VERSION}*
 
 echo "libxc {version} installed successfully"
 

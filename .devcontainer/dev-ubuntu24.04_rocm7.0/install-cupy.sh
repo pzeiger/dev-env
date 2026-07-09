@@ -8,5 +8,5 @@ else
   ROCM_VERSION_TMP="${ROCM_VERSION}"
 fi
 
-pip install fastrlock numpy
-pip install amd-cupy --extra-index-url "https://pypi.amd.com/rocm-${ROCM_VERSION_TMP}/simple"
+uv pip install fastrlock numpy
+uv pip install amd-cupy --extra-index-url "https://pypi.amd.com/rocm-${ROCM_VERSION_TMP}/simple"
