@@ -132,6 +132,26 @@ ENV LIBVDWXC_INCLUDE=${LIBVDWXC_HOME}/include
 ENV LIBVDWXC_LIBS=${LIBVDWXC_HOME}/lib
 ENV LD_LIBRARY_PATH=${LIBVDWXC_LIBS}:${LD_LIBRARY_PATH:-}
 
+# LaTeX toolchain from Ubuntu package sources (pdflatex + latexmk), for
+# building the theory/proposal documents inside the devcontainer.
+# Coverage of the packages used in /workspaces/run and /workspaces/projects:
+#   texlive-latex-base         pdflatex, amsmath, geometry
+#   texlive-latex-recommended  hyperref, booktabs, microtype, amssymb/bm
+#   texlive-latex-extra        enumitem, titlesec
+#   texlive-science            physics.sty
+# --no-install-recommends keeps the large -doc trees out of the image.
+RUN << 'EOF'
+set -e
+apt-get update
+apt-get install -y --no-install-recommends \
+    texlive-latex-base \
+    texlive-latex-recommended \
+    texlive-latex-extra \
+    texlive-fonts-recommended \
+    texlive-science \
+    latexmk
+EOF
+
 # Clean APT cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
