@@ -3,16 +3,12 @@
 set -euxo pipefail
 
 # libxc {version} module - DFT exchange-correlation functionals library
-
-apt-get install -y -q \
+apt-get update && apt-get install -y -q \
     wget \
     autoconf automake libtool \
     build-essential gfortran \
     libfftw3-dev libfftw3-mpi-dev \
     openmpi-bin libopenmpi-dev
-    
-
-apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set installation prefix
 LIBVDWXC_PREFIX=${INSTALL_DIR}/libvdwxc-${LIBVDWXC_VERSION}

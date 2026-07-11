@@ -27,17 +27,16 @@ apt-get install -y git \
     libdw1
 
 # install Claude CLI
-apt-get update && apt-get install -y --no-install-recommends \
+apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
     && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get update && apt-get install -y --no-install-recommends nodejs \
-    && npm install -g @anthropic-ai/claude-code \
-    && rm -rf /var/lib/apt/lists/*
+    && npm install -g @anthropic-ai/claude-code
 
 # install github CLI
-(type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
+(type -p wget >/dev/null || sudo apt install wget -y) \
         && sudo mkdir -p -m 755 /etc/apt/keyrings \
         && out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
         && cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \

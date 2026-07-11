@@ -7,7 +7,7 @@ set -euxo pipefail
 # Install build dependencies
 # build-essential, gfortran         provides gfortran, gcc, g++, make
 # autoconf automake libtool         provides full Autotools toolchain
-apt-get install -y -q \
+apt-get update && apt-get install -y -q \
     wget \
     build-essential gfortran \
     cmake
