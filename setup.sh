@@ -2,7 +2,10 @@
 uv pip install --no-cache "jax[rocm7-local]"
 uv pip install --no-cache ase h5py jupyterlab matplotlib notebook pypdf xarray
 uv pip install --no-cache sympy spglib phonopy
-#uv pip install --no-cache dftd3 tad-dftd3
+uv pip install --no-cache dftd3 #tad-dftd3
+uv pip install --no-cache "dftd4[ase]"   # DFT-D4; prebuilt wheel bundles libdftd4
+uv pip install --no-cache hiphive phonopy calorine
+uv pip install --no-cache euphonic[matplotlib,phonopy-reader,brille]
 
 # Install our repos
 uv pip install --no-cache -e /workspaces/code/abTEM
