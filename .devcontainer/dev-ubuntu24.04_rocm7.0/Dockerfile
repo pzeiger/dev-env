@@ -132,6 +132,17 @@ ENV LIBVDWXC_INCLUDE=${LIBVDWXC_HOME}/include
 ENV LIBVDWXC_LIBS=${LIBVDWXC_HOME}/lib
 ENV LD_LIBRARY_PATH=${LIBVDWXC_LIBS}:${LD_LIBRARY_PATH:-}
 
+# Install libMBD (many-body dispersion; compiled Fortran backend for pymbd).
+# setup.sh links pymbd against this via LIBMBD_PREFIX=${LIBMBD_HOME}.
+ENV LIBMBD_VERSION=0.14.0
+COPY install-libmbd-ubuntu.sh /tmp/
+RUN chmod +x /tmp/install-libmbd-ubuntu.sh && /tmp/install-libmbd-ubuntu.sh
+
+ENV LIBMBD_HOME=${INSTALL_DIR}/libmbd
+ENV LIBMBD_INCLUDE=${LIBMBD_HOME}/include
+ENV LIBMBD_LIBS=${LIBMBD_HOME}/lib
+ENV LD_LIBRARY_PATH=${LIBMBD_LIBS}:${LD_LIBRARY_PATH:-}
+
 # LaTeX toolchain from Ubuntu package sources (pdflatex + latexmk), for
 # building the theory/proposal documents inside the devcontainer.
 # Coverage of the packages used in /workspaces/run and /workspaces/projects:
