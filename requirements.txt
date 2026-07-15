@@ -1,0 +1,40 @@
+# Runtime + dev stack, resolved in ONE pass (see setup.sh) so that numpy/cffi
+# version conflicts surface as a hard resolution error instead of being decided
+# by whichever `uv pip install` ran last.
+#
+# Build-time env vars and the cffi override live in setup.sh, not here — a
+# requirements file carries *what* to install, not the build environment.
+
+# --- numpy>=2 scientific stack ---
+jax[rocm7-local]
+ase
+h5py
+jupyterlab
+matplotlib
+notebook
+pypdf
+xarray
+sympy
+spglib
+phonopy
+dftd3
+dftd4[ase]
+hiphive
+calorine
+euphonic[matplotlib,phonopy-reader,brille]
+
+# --- editable dev repos (bind-mounted; see devcontainer.json mounts) ---
+-e /workspaces/code/abTEM
+-e /workspaces/code/gpaw
+-e /workspaces/code/gpaw-weaver
+-e /workspaces/code/EELSfornax[all]
+-e /workspaces/code/PySlice[md]
+
+# --- MBD@rsSCS many-body dispersion (pymbd + libMBD, from our local repo) ---
+# Editable from the bind-mounted libmbd repo. The libMBD Fortran backend is
+# compiled from the same tree by setup.sh, which sets LIBMBD_PREFIX so this
+# build links against it (an empty LIBMBD_PREFIX would silently drop to the
+# pure-Python fallback). Our fork relaxes numpy to >=1.20 (the 0.14.0 release
+# pins numpy<2.0) and cffi to >=1 (was <2), so it coexists with numpy 2 / the
+# cffi>=2 required by cryptography.
+-e /workspaces/code/libmbd

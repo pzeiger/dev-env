@@ -17,12 +17,13 @@
     "source=${localWorkspaceFolder}/../code/PySlice,target=/workspaces/code/PySlice,type=bind",
     "source=${localWorkspaceFolder}/../code/gpaw-weaver,target=/workspaces/code/gpaw-weaver,type=bind",
     "source=${localWorkspaceFolder}/../code/EELSfornax,target=/workspaces/code/EELSfornax,type=bind",
+    "source=${localWorkspaceFolder}/../code/libmbd,target=/workspaces/code/libmbd,type=bind",
     "source=${localWorkspaceFolder}/../projects,target=/workspaces/projects,type=bind",
     "source=${localWorkspaceFolder}/../run,target=/workspaces/run,type=bind",
     "source=${localWorkspaceFolder}/../hpcenvs,target=/workspaces/hpcenvs,type=bind"
   ],
-  "postCreateCommand": "GPAW_CONFIG='${containerWorkspaceFolder}/dev-env/.devcontainer/dev-ubuntu24.04_rocm7.0/siteconfig.py' bash /workspaces/dev-env/setup.sh && uv pip install --no-cache pypdf",
-  "postStartCommand": "cd /workspaces/run && gpaw test && gpaw -P 4 test && cd ${containerWorkspaceFolder} && nohup bash -c 'jupyter notebook --ip=0.0.0.0 --port=8888 --allow-root --NotebookApp.token='' --no-browser > /home/ubuntu/nohup.out &'",
+  "postCreateCommand": "GPAW_CONFIG='${containerWorkspaceFolder}/dev-env/.devcontainer/dev-ubuntu24.04_rocm7.0/siteconfig.py' bash /workspaces/dev-env/setup.sh",
+  "postStartCommand": "cd /workspaces/run && gpaw test && mpiexec -n 4 gpaw test && cd ${containerWorkspaceFolder} && nohup bash -c 'jupyter notebook --ip=0.0.0.0 --port=8888 --allow-root --NotebookApp.token='' --no-browser > /home/ubuntu/nohup.out &'",
   
   "forwardPorts": [
       8888
