@@ -2,25 +2,24 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# --- Build libMBD from the local repo (bind-mounted, runtime-only) -----------
-# libMBD is the compiled Fortran backend for pymbd. It is built here rather than
-# in the Dockerfile because /workspaces/code/libmbd is a bind mount that only
-# exists at runtime (postCreateCommand). Building libMBD AND pymbd from the SAME
-# working tree is deliberate: pymbd.fortran hard-asserts that libMBD's version
-# matches pymbd's exactly (down to the git commit and `.dirty` flag). Both read
-# their version from this tree's `git describe`, so they always agree — and the
-# repo's .gitignore covers the editable-install artifacts, so the tree stays
-# clean. pymbd itself is installed (editable) from the same path via
-# requirements.txt.
-LIBMBD_SRC=/workspaces/code/libmbd
+# --- Build libMBD + pymbd from the official upstream repo --------------------
+# libMBD is the compiled Fortran backend for pymbd. We clone the official repo
+# ONCE and build BOTH libMBD (below) and pymbd (editable, via requirements.txt)
+# from that same clone. This is deliberate: pymbd.fortran hard-asserts that the
+# compiled libMBD's version matches pymbd's exactly (git commit, and the .dirty
+# flag). A fresh clone is clean and carries upstream's tags, so both `git
+# describe` to the same version and the assertion holds; the repo's .gitignore
+# covers the editable-install artifacts, so the tree stays clean.
+#   Do NOT instead `pip install "pymbd @ git+<url>"`: uv builds that in its own
+#   clone which ends up .dirty, mismatching a separately-built clean libMBD.
+LIBMBD_GIT=${LIBMBD_GIT:-https://github.com/libmbd/libmbd.git}
+LIBMBD_SRC=/home/ubuntu/.local/src/libmbd
 LIBMBD_PREFIX=/home/ubuntu/.local/libmbd
 LIBMBD_BUILD=/tmp/libmbd-build
 
-if [ ! -e "$LIBMBD_SRC/CMakeLists.txt" ]; then
-    echo "ERROR: $LIBMBD_SRC not mounted (no CMakeLists.txt). Check the bind" \
-         "mount in devcontainer.json and that ../code/libmbd exists on the host." >&2
-    exit 1
-fi
+# Fresh clone of the latest upstream (set LIBMBD_GIT to a fork/ref to override).
+rm -rf "$LIBMBD_SRC"
+git clone "$LIBMBD_GIT" "$LIBMBD_SRC"
 
 # Serial build (ScaLAPACK/MPI off — pymbd here is single-process per rank). The
 # cffi extension rpaths ${LIBMBD_PREFIX}/lib, so no LD_LIBRARY_PATH is needed.
