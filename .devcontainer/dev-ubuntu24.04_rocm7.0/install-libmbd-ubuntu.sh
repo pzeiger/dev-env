@@ -8,38 +8,38 @@ set -euxo pipefail
 # (no pymbd.fortran). Built with CMake against the system OpenBLAS/LAPACK.
 
 apt-get update && apt-get install -y -q \
-    git \
     wget \
     build-essential gfortran \
     cmake
 
 # ---------------------------------------------------------------------------
-# git build (current): track upstream master, paired with the git install of
-# pymbd in requirements.txt, until a numpy-2-compatible pymbd release lands on
-# PyPI. LIBMBD_GIT_REF optionally pins a commit/tag (empty = default branch).
+# versioned release build (current): official release tarball from GitHub,
+# paired with `pip install pymbd==${LIBMBD_VERSION}` from PyPI. The release
+# ships cmake/libMBDVersionTag.cmake, so CMake stamps the version without a .git
+# checkout, and both libMBD and pymbd report the same clean release version
+# (for a release, pymbd.fortran's assertion only checks major.minor).
 # ---------------------------------------------------------------------------
-LIBMBD_PREFIX_DIR=${INSTALL_DIR}/libmbd-git
+LIBMBD_PREFIX_DIR=${INSTALL_DIR}/libmbd-${LIBMBD_VERSION}
 
 cd /tmp
-rm -rf libmbd-git
-git clone https://github.com/libmbd/libmbd.git libmbd-git
-cd libmbd-git
-if [ -n "${LIBMBD_GIT_REF:-}" ]; then
-    git checkout "${LIBMBD_GIT_REF}"
-fi
+rm -rf libmbd-${LIBMBD_VERSION}
+wget -q https://github.com/libmbd/libmbd/releases/download/${LIBMBD_VERSION}/libmbd-${LIBMBD_VERSION}.tar.gz
+tar xzf libmbd-${LIBMBD_VERSION}.tar.gz
+cd libmbd-${LIBMBD_VERSION}
 
 # ---------------------------------------------------------------------------
-# versioned release build (kept for the future): to switch back from git to a
-# PyPI release, comment out the git block above, uncomment this block, and
-# restore `ENV LIBMBD_VERSION=...` in the Dockerfile.
+# git build (kept for the future): to track upstream master instead of a
+# release, comment out the release block above, uncomment this block, add `git`
+# to the apt-get above, drop `ENV LIBMBD_VERSION` in the Dockerfile, and install
+# pymbd from the same clone (not PyPI) so the versions match. LIBMBD_GIT_REF
+# optionally pins a commit/tag (empty = default branch).
 # ---------------------------------------------------------------------------
-# LIBMBD_PREFIX_DIR=${INSTALL_DIR}/libmbd-${LIBMBD_VERSION}
-#
+# LIBMBD_PREFIX_DIR=${INSTALL_DIR}/libmbd-git
 # cd /tmp
-# rm -rf libmbd-${LIBMBD_VERSION}
-# wget -q https://github.com/libmbd/libmbd/releases/download/${LIBMBD_VERSION}/libmbd-${LIBMBD_VERSION}.tar.gz
-# tar xzf libmbd-${LIBMBD_VERSION}.tar.gz
-# cd libmbd-${LIBMBD_VERSION}
+# rm -rf libmbd-git
+# git clone https://github.com/libmbd/libmbd.git libmbd-git
+# cd libmbd-git
+# if [ -n "${LIBMBD_GIT_REF:-}" ]; then git checkout "${LIBMBD_GIT_REF}"; fi
 
 # Serial build (ScaLAPACK/MPI off — pymbd here is used single-process per rank).
 cmake -B build \
@@ -55,4 +55,4 @@ ln -sfn ${LIBMBD_PREFIX_DIR} ${INSTALL_DIR}/libmbd
 cd /
 rm -rf /tmp/libmbd-*
 
-echo "✓ libmbd installed to ${LIBMBD_PREFIX_DIR}"
+echo "✓ libmbd ${LIBMBD_VERSION} installed to ${LIBMBD_PREFIX_DIR}"

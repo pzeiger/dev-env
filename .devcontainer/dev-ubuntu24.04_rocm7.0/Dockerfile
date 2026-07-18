@@ -132,29 +132,22 @@ ENV LIBVDWXC_INCLUDE=${LIBVDWXC_HOME}/include
 ENV LIBVDWXC_LIBS=${LIBVDWXC_HOME}/lib
 ENV LD_LIBRARY_PATH=${LIBVDWXC_LIBS}:${LD_LIBRARY_PATH:-}
 
-# libMBD (many-body dispersion; the compiled Fortran backend for pymbd) is built
-# at RUNTIME by setup.sh from the bind-mounted local repo /workspaces/code/libmbd
-# (bind mounts don't exist during the image build), installed under
-# /home/ubuntu/.local/libmbd. Here we only install the build toolchain, since
-# setup.sh runs as the unprivileged `ubuntu` user and can't apt-get. The cffi
-# extension rpaths that prefix, so no LD_LIBRARY_PATH entry is needed.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        build-essential gfortran cmake git wget \
+# libMBD (many-body dispersion; the compiled Fortran backend for pymbd), built
+# into the image from the official release tarball. pymbd (pymbd==${LIBMBD_VERSION}
+# from PyPI, in requirements.txt) links against it via LIBMBD_PREFIX=${LIBMBD_HOME}
+# in setup.sh; matching release versions satisfy pymbd.fortran's version
+# assertion. install-libmbd-ubuntu.sh also installs the build toolchain
+# (build-essential/gfortran/cmake), which stays in the image for pymbd's runtime
+# cffi build. Keep LIBMBD_VERSION in step with the pymbd pin in requirements.txt.
+ENV LIBMBD_VERSION=0.14.1
+COPY install-libmbd-ubuntu.sh /tmp/
+RUN chmod +x /tmp/install-libmbd-ubuntu.sh && /tmp/install-libmbd-ubuntu.sh \
     && rm -rf /var/lib/apt/lists/*
 
-# Fallback — compile libMBD INTO the image (from git master, or a versioned
-# release) instead of the local repo. Restore this block, drop the libMBD build
-# from setup.sh, and set LIBMBD_PREFIX=${LIBMBD_HOME} there. LIBMBD_GIT_REF pins
-# a commit/tag (empty = default branch); install-libmbd-ubuntu.sh carries both a
-# git build (active) and a versioned-release build (commented).
-# ENV LIBMBD_GIT_REF=""
-# ENV LIBMBD_VERSION=0.14.0
-# COPY install-libmbd-ubuntu.sh /tmp/
-# RUN chmod +x /tmp/install-libmbd-ubuntu.sh && /tmp/install-libmbd-ubuntu.sh
-# ENV LIBMBD_HOME=${INSTALL_DIR}/libmbd
-# ENV LIBMBD_INCLUDE=${LIBMBD_HOME}/include
-# ENV LIBMBD_LIBS=${LIBMBD_HOME}/lib
-# ENV LD_LIBRARY_PATH=${LIBMBD_LIBS}:${LD_LIBRARY_PATH:-}
+ENV LIBMBD_HOME=${INSTALL_DIR}/libmbd
+ENV LIBMBD_INCLUDE=${LIBMBD_HOME}/include
+ENV LIBMBD_LIBS=${LIBMBD_HOME}/lib
+ENV LD_LIBRARY_PATH=${LIBMBD_LIBS}:${LD_LIBRARY_PATH:-}
 
 # LaTeX toolchain from Ubuntu package sources (pdflatex + latexmk), for
 # building the theory/proposal documents inside the devcontainer.

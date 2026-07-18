@@ -30,12 +30,12 @@ euphonic[matplotlib,phonopy-reader,brille]
 -e /workspaces/code/EELSfornax[all]
 -e /workspaces/code/PySlice[md]
 
-# --- MBD@rsSCS many-body dispersion (pymbd + libMBD, from upstream git) ---
-# setup.sh clones the official libmbd repo to this path and compiles the libMBD
-# Fortran backend from the same tree, then sets LIBMBD_PREFIX so this editable
-# build links against it (an empty LIBMBD_PREFIX would silently drop to the
-# pure-Python fallback). Building both from one clone keeps their versions
-# matched for pymbd.fortran's assertion. Upstream master now allows numpy>=1.20
-# and cffi>=1 (the 0.14.0 release pinned numpy<2.0, cffi<2), so pymbd coexists
-# with numpy 2 and the cffi>=2 required by cryptography.
--e /home/ubuntu/.local/src/libmbd
+# --- MBD@rsSCS many-body dispersion (pymbd, official PyPI release) ---
+# The 0.14.1 release allows numpy>=1.20 and cffi>=1 (the 0.14.0 release pinned
+# numpy<2.0, cffi<2), so pymbd coexists with numpy 2 and the cffi>=2 required by
+# cryptography — no more git/editable build. Its cffi Fortran backend links
+# against the matching libMBD 0.14.1 compiled into the image; setup.sh sets
+# LIBMBD_PREFIX=${LIBMBD_HOME} for this install (empty would silently drop to
+# the pure-Python fallback). Keep this version in step with LIBMBD_VERSION in
+# the Dockerfile so pymbd.fortran's version assertion holds.
+pymbd==0.14.1
