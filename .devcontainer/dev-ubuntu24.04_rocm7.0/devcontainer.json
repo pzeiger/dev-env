@@ -22,7 +22,7 @@
     "source=${localWorkspaceFolder}/../hpcenvs,target=/workspaces/hpcenvs,type=bind"
   ],
   "postCreateCommand": "GPAW_CONFIG='${containerWorkspaceFolder}/dev-env/.devcontainer/dev-ubuntu24.04_rocm7.0/siteconfig.py' bash /workspaces/dev-env/setup.sh",
-  "postStartCommand": "cd /workspaces/run && GPAW_MPI_BACKEND=cgpaw gpaw test && mpiexec -n 4 gpaw test && cd ${containerWorkspaceFolder} && nohup bash -c 'jupyter notebook --ip=0.0.0.0 --port=8888 --allow-root --NotebookApp.token='' --no-browser > /home/ubuntu/nohup.out &'",
+  "postStartCommand": "cd /workspaces/run && GPAW_MPI_BACKEND=cgpaw gpaw test && GPAW_MPI_BACKEND=cgpaw mpiexec -n 4 gpaw test && cd ${containerWorkspaceFolder} && nohup bash -c 'jupyter notebook --ip=0.0.0.0 --port=8888 --allow-root --NotebookApp.token='' --no-browser > /home/ubuntu/nohup.out &'",
   
   "forwardPorts": [
       8888
@@ -68,7 +68,6 @@
     "ANTHROPIC_API_KEY": "${localEnv:ANTHROPIC_API_KEY}",
     "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
     "CLAUDE_CONFIG_DIR": "/workspaces/dev-env/.claude",
-    "GPAW_NEW": "0",
     "GPAW_USE_GPUS": "0",
     "XLA_PYTHON_CLIENT_PREALLOCATE": "false",
     "JAX_COMPILATION_CACHE_DIR": "/workspaces/run/.jax_cache",
