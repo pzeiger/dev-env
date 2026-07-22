@@ -169,6 +169,10 @@ apt-get install -y --no-install-recommends \
     latexmk
 EOF
 
+# Bader charge analysis (Henkelman group) — precompiled static Linux binary.
+RUN curl -fsSL https://theory.cm.utexas.edu/henkelman/code/bader/download/bader_lnx_64.tar.gz \
+    | tar xz -C /usr/local/bin && chmod +x /usr/local/bin/bader
+
 # Clean APT cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
