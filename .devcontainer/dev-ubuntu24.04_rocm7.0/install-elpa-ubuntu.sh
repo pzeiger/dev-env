@@ -20,7 +20,7 @@ tar xzf "elpa-${ELPA_VERSION}.tar.gz"
 cd "elpa-${ELPA_VERSION}"
 mkdir build && cd build
 ../configure \
-    CC=mpicc FC=mpifort \
+    CC=mpicc CXX=mpicxx FC=mpifort \
     CFLAGS="-O3 -march=x86-64-v3 -ftree-vectorize -funsafe-math-optimizations -fno-math-errno" \
     FCFLAGS="-O3 -march=x86-64-v3 -ftree-vectorize -funsafe-math-optimizations -fno-math-errno" \
     SCALAPACK_LDFLAGS="-lscalapack-openmpi -lopenblas" \
