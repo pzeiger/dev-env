@@ -139,7 +139,7 @@ ENV LD_LIBRARY_PATH=${LIBVDWXC_LIBS}:${LD_LIBRARY_PATH:-}
 # assertion. install-libmbd-ubuntu.sh also installs the build toolchain
 # (build-essential/gfortran/cmake), which stays in the image for pymbd's runtime
 # cffi build. Keep LIBMBD_VERSION in step with the pymbd pin in requirements.txt.
-ENV LIBMBD_VERSION=0.14.1
+ENV LIBMBD_VERSION=0.15.0
 COPY install-libmbd-ubuntu.sh /tmp/
 RUN chmod +x /tmp/install-libmbd-ubuntu.sh && /tmp/install-libmbd-ubuntu.sh \
     && rm -rf /var/lib/apt/lists/*
