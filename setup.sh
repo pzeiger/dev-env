@@ -8,7 +8,13 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # silently decided by whichever install ran last. See requirements.txt.
 #
 # Build-time env vars (must be on the command line, not in the requirements file):
-#   GPAW_BUILD_GPU=0              build gpaw for CPU
+#   GPAW_BUILD_GPU=1              build gpaw with GPU (HIP/ROCm) support. The
+#                     arch is set in siteconfig.py (GPAW_GPU_ARCH, default
+#                     gfx1151); the runtime must report that same arch (i.e. the
+#                     Dockerfile must NOT set HSA_OVERRIDE_GFX_VERSION) or GPU
+#                     kernel launches segfault on the mismatch. GPU use stays
+#                     opt-in at runtime (GPAW_USE_GPUS / parallel={'gpu': True});
+#                     a GPU build still runs CPU/MPI workflows unchanged.
 #   LIBMBD_PREFIX=${LIBMBD_HOME}  link pymbd (pymbd==0.14.1 from PyPI, in
 #                     requirements.txt) against the libMBD 0.14.1 release
 #                     compiled into the image (Dockerfile /
@@ -18,7 +24,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 #                     LIBMBD_PREFIX makes pymbd skip the Fortran extension
 #                     entirely (silent pure-Python fallback).
 # GPAW_CONFIG is exported by postCreateCommand.
-GPAW_BUILD_GPU=0 LIBMBD_PREFIX="${LIBMBD_HOME:?set by the Dockerfile}" \
+GPAW_BUILD_GPU=1 LIBMBD_PREFIX="${LIBMBD_HOME:?set by the Dockerfile}" \
     uv pip install --no-cache -r "$HERE/requirements.txt"
 
 mkdir -p /home/ubuntu/.local/bin

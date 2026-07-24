@@ -190,7 +190,13 @@ RUN uv pip install --no-cache torch torchvision --index-url https://download.pyt
 #COPY --chown=ubuntu:ubuntu siteconfig.py /home/ubuntu/
 #RUN ls -ahl ./* && GPAW_BUILD_GPU=0 GPAW_CONFIG='/home/ubuntu/siteconfig.py' uv pip install --no-cache gpaw && rm siteconfig.py
 
-# This is a supposed fix to help with gfx1151
-# See: https://github.com/pytorch/pytorch/issues/164346
-ENV HSA_OVERRIDE_GFX_VERSION="11.0.0"
+# NOTE: earlier images set HSA_OVERRIDE_GFX_VERSION="11.0.0" to present the
+# gfx1151 (Strix Halo) iGPU as gfx1100, working around incomplete gfx1151
+# support (see https://github.com/pytorch/pytorch/issues/164346). As of
+# ROCm 7.2 gfx1151 is natively supported end to end: the runtime reports it,
+# rocBLAS/hipBLAS ship gfx1151 Tensile kernels, and both PyTorch and GPAW
+# (built with GPAW_GPU_ARCH=gfx1151, the siteconfig default) run correctly.
+# The override is removed so GPU code is compiled and dispatched for the true
+# arch. If it is ever re-added, the runtime reports gfx1100 and GPAW must be
+# rebuilt with GPAW_GPU_ARCH=gfx1100 to match, or GPU launches segfault.
 

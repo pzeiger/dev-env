@@ -102,12 +102,29 @@ if os.getenv('GPAW_BUILD_GPU', '0') == '1':
     gpu_compiler = 'hipcc'
     gpu_include_dirs = ['/opt/rocm/include']
     gpu_library_dirs = ['/opt/rocm/lib']
+    # This box is a Strix Halo iGPU whose native arch is gfx1151, and ROCm 7.2
+    # supports it natively (the Dockerfile no longer sets
+    # HSA_OVERRIDE_GFX_VERSION). HIP kernels must be compiled for the arch the
+    # runtime reports or launches segfault, so default to gfx1151. If the
+    # override is reinstated (runtime then reports gfx1100), set
+    # GPAW_GPU_ARCH=gfx1100 to match.
+    gpu_arch = os.getenv('GPAW_GPU_ARCH', 'gfx1151')
     gpu_compile_args = [
         '-g',
         '-O3',
-        '--offload-arch=gfx1151',
+        f'--offload-arch={gpu_arch}',
        ]
     libraries += ['amdhip64', 'hipblas']
+    # The host C compiler (mpicc) also pulls in <hip/hip_runtime.h> from the
+    # GPU-enabled C sources (e.g. c/bc.c via gpu-runtime.h) and links the HIP
+    # runtime, so the rocm include/lib dirs must be on the *general* paths too,
+    # not only gpu_include_dirs/gpu_library_dirs (which apply to hipcc only).
+    if '/opt/rocm/include' not in include_dirs:
+        include_dirs += ['/opt/rocm/include']
+    if '/opt/rocm/lib' not in library_dirs:
+        library_dirs += ['/opt/rocm/lib']
+    if '/opt/rocm/lib' not in runtime_library_dirs:
+        runtime_library_dirs += ['/opt/rocm/lib']
 
 
 #if 'blacs' not in libraries:
