@@ -149,6 +149,25 @@ ENV LIBMBD_INCLUDE=${LIBMBD_HOME}/include
 ENV LIBMBD_LIBS=${LIBMBD_HOME}/lib
 ENV LD_LIBRARY_PATH=${LIBMBD_LIBS}:${LD_LIBRARY_PATH:-}
 
+# ELPA (scalable dense eigensolver; GPAW elpa=True) — CPU AVX2/OpenMP against
+# the container OpenMPI + OpenBLAS + ScaLAPACK. The build toolchain
+# (build-essential/gfortran/cmake) is already present from the libMBD step.
+ENV ELPA_VERSION=2024.05.001
+COPY install-elpa-ubuntu.sh /tmp/
+RUN chmod +x /tmp/install-elpa-ubuntu.sh && /tmp/install-elpa-ubuntu.sh
+ENV ELPA_HOME=${INSTALL_DIR}/elpa
+ENV LD_LIBRARY_PATH=${ELPA_HOME}/lib:${LD_LIBRARY_PATH:-}
+
+# MAGMA (GPU dense linear algebra; GPAW magma=True). hipMAGMA is BEST-EFFORT on
+# RDNA gfx1151 (unsupported upstream) — the script is non-fatal, and the
+# siteconfig only enables magma when /opt/software/magma exists. A nonexistent
+# entry on LD_LIBRARY_PATH is harmless.
+ENV MAGMA_VERSION=2.8.0
+COPY install-magma-ubuntu.sh /tmp/
+RUN chmod +x /tmp/install-magma-ubuntu.sh && /tmp/install-magma-ubuntu.sh
+ENV MAGMA_HOME=${INSTALL_DIR}/magma
+ENV LD_LIBRARY_PATH=${MAGMA_HOME}/lib:${LD_LIBRARY_PATH:-}
+
 # LaTeX toolchain from Ubuntu package sources (pdflatex + latexmk), for
 # building the theory/proposal documents inside the devcontainer.
 # Coverage of the packages used in /workspaces/run and /workspaces/projects:

@@ -1,3 +1,4 @@
+import glob
 import os
 from pathlib import Path
 
@@ -95,6 +96,25 @@ if 1:
             libraries += ['fftw3_mpi']
 
 
+# ELPA (scalable dense eigensolver; alternative to the ScaLAPACK dense
+# diagonalisation). Built from source into /opt/software/elpa by
+# install-elpa-ubuntu.sh; headers land in a versioned include/elpa-*/ subdir,
+# so glob for it (the ELPA version can bump without editing this file).
+_elpa_root = '/opt/software/elpa'
+_elpa_inc = glob.glob(os.path.join(_elpa_root, 'include', 'elpa-*'))
+if _elpa_inc:
+    elpa = True
+    if 'elpa' not in libraries:
+        libraries += ['elpa']
+    _elpa_lib = os.path.join(_elpa_root, 'lib')
+    if _elpa_lib not in library_dirs:
+        library_dirs += [_elpa_lib]
+    if _elpa_lib not in runtime_library_dirs:
+        runtime_library_dirs += [_elpa_lib]
+    if _elpa_inc[0] not in include_dirs:
+        include_dirs += [_elpa_inc[0]]
+
+
 # hip
 if os.getenv('GPAW_BUILD_GPU', '0') == '1':
     gpu = True
@@ -125,6 +145,23 @@ if os.getenv('GPAW_BUILD_GPU', '0') == '1':
         library_dirs += ['/opt/rocm/lib']
     if '/opt/rocm/lib' not in runtime_library_dirs:
         runtime_library_dirs += ['/opt/rocm/lib']
+
+    # MAGMA (GPU dense linear algebra for GPAW's GPU eigensolver). Built
+    # best-effort by install-magma-ubuntu.sh — hipMAGMA on RDNA gfx1151 is
+    # experimental and may be absent. GPU-only in GPAW (c/gpu/cpp/magma), so
+    # it lives inside the GPU block; enable only if the library is present.
+    if os.path.isdir('/opt/software/magma'):
+        magma = True
+        if 'magma' not in libraries:
+            libraries += ['magma']
+        _magma_lib = '/opt/software/magma/lib'
+        _magma_inc = '/opt/software/magma/include'
+        if _magma_lib not in library_dirs:
+            library_dirs += [_magma_lib]
+        if _magma_lib not in runtime_library_dirs:
+            runtime_library_dirs += [_magma_lib]
+        if _magma_inc not in include_dirs:
+            include_dirs += [_magma_inc]
 
 
 #if 'blacs' not in libraries:
