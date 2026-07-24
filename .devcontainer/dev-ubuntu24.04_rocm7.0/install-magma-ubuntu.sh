@@ -12,7 +12,7 @@
 set -uo pipefail   # intentionally NOT -e: a failed hipMAGMA build must not
                    # break the devcontainer image build.
 
-MAGMA_VERSION="${MAGMA_VERSION:-2.8.0}"
+MAGMA_VERSION="${MAGMA_VERSION:-2.7.2}"
 INSTALL_DIR="${INSTALL_DIR:-/opt/software}"
 ROCM_PATH="${ROCM_HOME:-/opt/rocm}"
 GPU_ARCH="${GPAW_GPU_ARCH:-gfx1151}"

@@ -162,7 +162,7 @@ ENV LD_LIBRARY_PATH=${ELPA_HOME}/lib:${LD_LIBRARY_PATH:-}
 # RDNA gfx1151 (unsupported upstream) — the script is non-fatal, and the
 # siteconfig only enables magma when /opt/software/magma exists. A nonexistent
 # entry on LD_LIBRARY_PATH is harmless.
-ENV MAGMA_VERSION=2.8.0
+ENV MAGMA_VERSION=2.7.2
 COPY install-magma-ubuntu.sh /tmp/
 RUN chmod +x /tmp/install-magma-ubuntu.sh && /tmp/install-magma-ubuntu.sh
 ENV MAGMA_HOME=${INSTALL_DIR}/magma
