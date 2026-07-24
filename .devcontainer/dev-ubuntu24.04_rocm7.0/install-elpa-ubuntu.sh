@@ -26,7 +26,7 @@ mkdir build && cd build
     SCALAPACK_LDFLAGS="-lscalapack-openmpi -lopenblas" \
     SCALAPACK_FCFLAGS="" \
     --prefix="${INSTALL_DIR}/elpa-${ELPA_VERSION}" \
-    --enable-openmp --disable-avx512 \
+    --enable-openmp --disable-avx512 --disable-c-tests \
     --enable-runtime-threading-support-checks \
     --enable-allow-thread-limiting \
     --without-threading-support-check-during-build
