@@ -156,6 +156,14 @@ if os.getenv('GPAW_BUILD_GPU', '0') == '1':
             libraries += ['magma']
         _magma_lib = '/opt/software/magma/lib'
         _magma_inc = '/opt/software/magma/include'
+        # hipcc compiles c/gpu/cpp/magma/*.cpp (which includes magma_v2.h), so
+        # the magma include+lib must be on the GPU compiler's own paths
+        # (gpu_include_dirs/gpu_library_dirs); the general include_dirs/
+        # library_dirs are NOT passed to the GPU compile step.
+        if _magma_inc not in gpu_include_dirs:
+            gpu_include_dirs += [_magma_inc]
+        if _magma_lib not in gpu_library_dirs:
+            gpu_library_dirs += [_magma_lib]
         if _magma_lib not in library_dirs:
             library_dirs += [_magma_lib]
         if _magma_lib not in runtime_library_dirs:
