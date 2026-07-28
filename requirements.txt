@@ -16,7 +16,6 @@ pypdf
 xarray
 sympy
 spglib
-phonopy
 dftd3
 dftd4[ase]
 hiphive
@@ -29,6 +28,7 @@ euphonic[matplotlib,phonopy-reader,brille]
 -e /workspaces/code/gpaw-weaver
 -e /workspaces/code/EELSfornax[all]
 -e /workspaces/code/PySlice[md]
+-e /workspaces/code/phonopy
 
 # --- MBD@rsSCS many-body dispersion (pymbd, official PyPI release) ---
 # The 0.15.0 release allows numpy>=1.20 and cffi>=1 (the 0.14.0 release pinned
