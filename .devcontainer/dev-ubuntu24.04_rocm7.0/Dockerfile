@@ -168,6 +168,26 @@ RUN chmod +x /tmp/install-magma-ubuntu.sh && /tmp/install-magma-ubuntu.sh
 ENV MAGMA_HOME=${INSTALL_DIR}/magma
 ENV LD_LIBRARY_PATH=${MAGMA_HOME}/lib:${LD_LIBRARY_PATH:-}
 
+# LAMMPS (stable) — CPU-only (KOKKOS-OpenMP; gfx1151 has no supported LAMMPS GPU
+# backend, so no GPU package here — GPU LAMMPS lives in the CUDA containers).
+# H5MD needs HDF5 (apt libhdf5-dev); OpenMPI/FFTW/zlib are already present;
+# kim-api is auto-downloaded by the build. cmake/gfortran come from the libMBD
+# step above. The python module is exposed via PYTHONPATH (not the venv).
+RUN apt-get update && apt-get install -y --no-install-recommends libhdf5-dev \
+    && rm -rf /var/lib/apt/lists/*
+ENV LAMMPS_BRANCH=stable
+COPY install-lammps-ubuntu.sh /tmp/
+# The script sets PYTHONDONTWRITEBYTECODE=1 so the root build never writes .pyc
+# into the ubuntu-owned venv; the trailing find is a same-layer safety net that
+# drops any root-owned __pycache__ that might still land there (it would break
+# `uv` in postCreateCommand with EACCES).
+RUN chmod +x /tmp/install-lammps-ubuntu.sh && /tmp/install-lammps-ubuntu.sh \
+    && { find "${VIRTUAL_ENV}" -type d -name __pycache__ -user root -exec rm -rf {} + 2>/dev/null || true; }
+ENV LAMMPS_HOME=${INSTALL_DIR}/lammps
+ENV PATH=${LAMMPS_HOME}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${LAMMPS_HOME}/lib:${LD_LIBRARY_PATH:-}
+ENV PYTHONPATH=${LAMMPS_HOME}/python:${PYTHONPATH:-}
+
 # LaTeX toolchain from Ubuntu package sources (pdflatex + latexmk), for
 # building the theory/proposal documents inside the devcontainer.
 # Coverage of the packages used in /workspaces/run and /workspaces/projects:
