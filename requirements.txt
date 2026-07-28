@@ -22,13 +22,18 @@ hiphive
 calorine
 euphonic[matplotlib,phonopy-reader,brille]
 
+# phonopy from PyPI, not an editable checkout — nothing we build against it
+# needs unreleased code. >=4.4.0 because we rely on phonopy.phonon.degeneracy
+# providing both degenerate_sets() and lift_degeneracy(); 4.4.0 is the release
+# verified to ship them.
+phonopy>=4.4.0
+
 # --- editable dev repos (bind-mounted; see devcontainer.json mounts) ---
 -e /workspaces/code/abTEM
 -e /workspaces/code/gpaw
 -e /workspaces/code/gpaw-weaver
 -e /workspaces/code/EELSfornax[all]
 -e /workspaces/code/PySlice[md]
--e /workspaces/code/phonopy
 
 # --- MBD@rsSCS many-body dispersion (pymbd, official PyPI release) ---
 # The 0.15.0 release allows numpy>=1.20 and cffi>=1 (the 0.14.0 release pinned
