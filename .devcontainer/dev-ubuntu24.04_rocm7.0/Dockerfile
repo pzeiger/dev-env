@@ -217,6 +217,12 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 USER ubuntu
 
+# Global git identity so every repo without its own user.* uses it, and it
+# survives container rebuilds (/home/ubuntu is baked into the image, not a
+# bind mount). Repos with a repo-local identity (e.g. hpcenvs) still override.
+RUN git config --global user.name "Paul Zeiger" \
+    && git config --global user.email "pmz.research@pm.me"
+
 # Install python packages
 RUN uv pip install --no-cache torch torchvision --index-url https://download.pytorch.org/whl/rocm${ROCM_VERSION}
 
