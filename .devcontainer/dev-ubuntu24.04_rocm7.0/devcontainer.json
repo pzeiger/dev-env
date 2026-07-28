@@ -20,6 +20,7 @@
     "source=${localWorkspaceFolder}/../code/EELSfornax,target=/workspaces/code/EELSfornax,type=bind",
     "source=${localWorkspaceFolder}/../projects,target=/workspaces/projects,type=bind",
     "source=${localWorkspaceFolder}/../run,target=/workspaces/run,type=bind",
+    "source=${localWorkspaceFolder}/../software_data,target=/workspaces/software_data,type=bind",
     "source=${localWorkspaceFolder}/../hpcenvs,target=/workspaces/hpcenvs,type=bind"
   ],
   "postCreateCommand": "GPAW_CONFIG='${containerWorkspaceFolder}/dev-env/.devcontainer/dev-ubuntu24.04_rocm7.0/siteconfig.py' bash /workspaces/dev-env/setup.sh",
@@ -72,6 +73,9 @@
     "GPAW_USE_GPUS": "0",
     "XLA_PYTHON_CLIENT_PREALLOCATE": "false",
     "JAX_COMPILATION_CACHE_DIR": "/workspaces/run/.jax_cache",
+    "FAIRCHEM_CACHE_DIR": "/workspaces/software_data/fairchem",
+    "ORB_CACHE_DIR": "/workspaces/software_data/orb",
+    "GPAW_SETUP_PATH": "/workspaces/software_data/gpaw",
     "LLVM_PATH": "/opt/rocm/llvm"
   }
 
