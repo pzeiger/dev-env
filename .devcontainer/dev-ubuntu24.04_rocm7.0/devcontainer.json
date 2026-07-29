@@ -17,6 +17,7 @@
     "source=${localWorkspaceFolder}/../code/PySlice,target=/workspaces/code/PySlice,type=bind",
     "source=${localWorkspaceFolder}/../code/gpaw-weaver,target=/workspaces/code/gpaw-weaver,type=bind",
     "source=${localWorkspaceFolder}/../code/EELSfornax,target=/workspaces/code/EELSfornax,type=bind",
+    "source=${localWorkspaceFolder}/../code/phonopy-chiral,target=/workspaces/code/phonopy-chiral,type=bind",
     "source=${localWorkspaceFolder}/../projects,target=/workspaces/projects,type=bind",
     "source=${localWorkspaceFolder}/../run,target=/workspaces/run,type=bind",
     "source=${localWorkspaceFolder}/../software_data,target=/workspaces/software_data,type=bind",
