@@ -188,6 +188,15 @@ ENV PATH=${LAMMPS_HOME}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${LAMMPS_HOME}/lib:${LD_LIBRARY_PATH:-}
 ENV PYTHONPATH=${LAMMPS_HOME}/python:${PYTHONPATH:-}
 
+# Quantum ESPRESSO (qe-7.6) — CPU build against the system gfortran/OpenMPI/
+# FFTW3/ScaLAPACK/OpenBLAS stack (the same libraries GPAW uses). CPU-only: QE's
+# GPU backends (nvfortran openacc/cuda, OpenMP-offload, ROCm) are not viable on
+# the gfx1151 dev box; the CUDA container images build QE with GPU support.
+COPY install-qe-ubuntu.sh /tmp/
+RUN chmod +x /tmp/install-qe-ubuntu.sh && /tmp/install-qe-ubuntu.sh
+ENV QE_HOME=${INSTALL_DIR}/qe
+ENV PATH=${QE_HOME}/bin:${PATH}
+
 # LaTeX toolchain from Ubuntu package sources (pdflatex + latexmk), for
 # building the theory/proposal documents inside the devcontainer.
 # Coverage of the packages used in /workspaces/run and /workspaces/projects:
