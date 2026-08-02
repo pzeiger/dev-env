@@ -34,3 +34,25 @@ from gpaw.cli.main import main
 main()
 EOF
 chmod +x /home/ubuntu/.local/bin/gpaw
+
+# --- Jupyter kernel: EELSfornax / JAX on the gfx1151 iGPU (presented as gfx1100)
+# JAX-ROCm ships no linear-algebra kernels (LU / solve / eigh / transpose) for
+# native gfx1151, so jnp.linalg.* fails (hipGetFuncBySymbol -> hipErrorInvalid-
+# DeviceFunction, then segfault); those kernels DO exist for gfx1100. FFT /
+# elementwise / matmul work natively. This kernel scopes
+# HSA_OVERRIDE_GFX_VERSION=11.0.0 to JAX work ONLY -- it must NOT be global (see
+# the GPAW note above: GPAW's GPU build is compiled for native gfx1151 and
+# segfaults under the override). Use the default python3 kernel for GPAW; use
+# this one for EELSfornax / JAX. Revisit on ROCm / jax-rocm upgrades: once
+# native gfx1151 linalg kernels ship, drop this kernel and the override.
+KDIR=/home/ubuntu/.local/share/jupyter/kernels/eelsfornax-gfx1100
+mkdir -p "$KDIR"
+PYBIN="$(command -v python)"
+cat > "$KDIR/kernel.json" << EOF
+{
+  "argv": ["${PYBIN}", "-m", "ipykernel_launcher", "-f", "{connection_file}"],
+  "display_name": "Python (EELSfornax · gfx1100)",
+  "language": "python",
+  "env": { "HSA_OVERRIDE_GFX_VERSION": "11.0.0" }
+}
+EOF
